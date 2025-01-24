@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { Repository } from "typeorm";
-import { User } from "./user.entity";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) { }
+  constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
   create(email: string, password: string) {
     const user = this.repo.create({ email, password });
@@ -14,7 +14,7 @@ export class UsersService {
 
   findOne(id: number) {
     if (!id) {
-      return null
+      return null;
     }
     return this.repo.findOneBy({ id });
   }
@@ -39,5 +39,4 @@ export class UsersService {
     }
     return this.repo.remove(user);
   }
-
 }

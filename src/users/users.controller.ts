@@ -1,21 +1,33 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, Session } from "@nestjs/common";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { UsersService } from "./users.service";
-import { UpdateUserDto } from "./dtos/update-user.dto";
-import { UserDto } from "./dtos/user.dto";
-import { Serialize } from "../interceptors/serialize.interceptor";
-import { AuthService } from "./auth.service";
-import { User } from "./user.entity";
-import { CurrentUser } from "./decorators/current-user-decorator";
-
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UsersService } from './users.service';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { UserDto } from './dtos/user.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/current-user-decorator';
+import { User } from './user.entity';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('auth')
 @Serialize(UserDto)
 export class UsersController {
   constructor(
     private userService: UsersService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
@@ -33,11 +45,12 @@ export class UsersController {
 
   @Post('/signout')
   signOut(@Session() session: any) {
-    session.userId = null
+    session.userId = null;
   }
 
   @Get('/whoami')
-  whoAmI(@CurrentUser() user: string) {
+  @UseGuards(AuthGuard)
+  whoAmI(@CurrentUser() user: User) {
     return user;
   }
 
@@ -64,7 +77,4 @@ export class UsersController {
   updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.userService.update(parseInt(id), body);
   }
-
-
 }
-
